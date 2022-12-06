@@ -1,0 +1,58 @@
+[package]
+name = "binance_spot_connector_rust"
+version = "1.0.0"
+authors = ["Binance"]
+edition = "2021"
+resolver = "2"
+autoexamples = false
+description = "This is a lightweight library that works as a connector to the Binance public API"
+readme = "README.md"
+repository = "https://github.com/binance/binance-connector-rust"
+license = "MIT"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = ["enable-ureq", "enable-tungstenite"]
+enable-hyper = [ "hyper", "hyper-tls", "serde_json", "futures-util", "tokio" ]
+enable-ureq = [ "ureq", "serde_json" ]
+enable-tungstenite = ["tungstenite"]
+enable-tokio-tungstenite = ["tokio-tungstenite"]
+full = ["enable-hyper", "enable-tungstenite", "enable-ureq", "enable-tokio-tungstenite"]
+
+[dependencies]
+hmac = "0.12.0"
+log = "0.4.14"
+serde = { version = "1.0.136", features = ["derive"] }
+sha2 = { version = "0.10.6", default-features = false, features = ["oid"] }
+url = "2.2.2"
+rust_decimal = "1.24.0"
+http = "0.2.7"
+strum = { version = "0.24", features = ["derive"] }
+rsa = { version = "0.7.1", features = ["pkcs5"] }
+rand = "0.8.5"
+signature = "1.6.4"
+base64 = "0.13.1"
+
+# enable-ureq
+ureq = { version = "2.4.0", optional = true }
+
+# enable-hyper
+hyper = { version = "0.14.16", features = ["full"], optional = true }
+serde_json = { version = "1.0.78", optional = true }
+hyper-tls = {version = "0.5.0", optional = true }
+futures-util = {version = "0.3.21", optional = true }
+tokio = { version = "1", features = ["time"], optional = true }
+
+# enable-tungstenite
+tungstenite = {version = "0.16.0", features = ["native-tls"], optional = true}
+
+# enable-tokio-tungstenite
+tokio-tungstenite = {version = "0.17.1", features = ["native-tls"], optional = true}
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+env_logger = "0.10.0"
+tower = "0.4.12"
+rust_decimal_macros = "1.24.0"
+cargo-audit = "0.17.4"

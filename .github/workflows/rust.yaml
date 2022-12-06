@@ -1,0 +1,33 @@
+name: Rust Main Workflow
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master, rc-**]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Fix Rust Version
+        run: rustup install 1.65
+
+      - name: Test
+        run: cargo test
+
+      - name: Format Check
+        run: cargo fmt -- --check
+
+      - name: Lint Check
+        run: cargo clippy --all-targets -- -D clippy::all
+
+      - name: Examples Format Check
+        working-directory: ./examples
+        run: cargo fmt -- --check
+
+      - name: Examples Lint Check
+        working-directory: ./examples
+        run: cargo clippy --all-targets -- -D clippy::all
