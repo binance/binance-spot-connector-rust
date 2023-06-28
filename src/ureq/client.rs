@@ -1,5 +1,6 @@
 use crate::http::{request::Request, Credentials};
 use crate::ureq::{Error, Response};
+use crate::version::VERSION;
 use http::Uri;
 use std::time::{SystemTime, UNIX_EPOCH};
 use ureq::{Agent, AgentBuilder, Error as UreqError};
@@ -56,6 +57,10 @@ impl BinanceHttpClient {
         let url: Uri = format!("{}{}", self.base_url, path).parse()?;
 
         let mut ureq_request = self.client.request(method.as_ref(), &url.to_string());
+
+        // Set User-Agent in header
+        let user_agent = &format!("binance-spot-connector-rust/{}", VERSION);
+        ureq_request = ureq_request.set("User-Agent", user_agent);
 
         // Map query parameters
         let has_params = !params.is_empty();
