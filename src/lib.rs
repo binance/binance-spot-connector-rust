@@ -78,6 +78,7 @@
 //! All errors emitted by the library can be converted to the generic error type of the respective client used to avoid complex error handling when using the pre-defined clients.
 
 mod utils;
+mod version;
 mod websocket;
 
 #[cfg(feature = "enable-tokio-tungstenite")]
