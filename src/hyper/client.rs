@@ -109,6 +109,7 @@ where
             url_parts.push(query_string);
         }
         let uri: Uri = url_parts.join("").parse()?;
+        log::debug!("{}", uri);
         let hyper_request = hyper_request.uri(uri);
         let request = hyper_request
             .body(Body::empty())
@@ -118,6 +119,7 @@ where
             .request(request)
             .await
             .map_err(|err| Error::Send(err))?;
+        log::debug!("{}", response.status());
         Ok(Response::from(response))
     }
 }
