@@ -64,13 +64,16 @@ where
         } = request.into();
         let mut url_parts = vec![self.base_url.to_owned(), path];
         let has_params = !params.is_empty();
-        let mut serializer = url::form_urlencoded::Serializer::new(String::new());
-        if has_params {
-            for (k, v) in params.iter() {
-                serializer.append_pair(k, v);
+        let mut query_string = String::new();
+        {
+            let mut serializer = url::form_urlencoded::Serializer::new(String::new());
+            if has_params {
+                for (k, v) in params.iter() {
+                    serializer.append_pair(k, v);
+                }
             }
+            query_string = serializer.finish();
         }
-        let mut query_string = serializer.finish();
         let mut hyper_request = hyper::Request::builder().method(method);
         let client_credentials = self.credentials.as_ref();
         let request_credentials = credentials.as_ref();
@@ -103,7 +106,6 @@ where
             url_parts.push(query_string);
         }
         let uri: Uri = url_parts.join("").parse()?;
-        log::debug!("{}", uri);
         let hyper_request = hyper_request.uri(uri);
         let request = hyper_request
             .body(Body::empty())
@@ -113,8 +115,6 @@ where
             .request(request)
             .await
             .map_err(|err| Error::Send(err))?;
-        log::debug!("{}", response.status());
-
         Ok(Response::from(response))
     }
 }
