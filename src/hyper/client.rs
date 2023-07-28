@@ -1,5 +1,6 @@
 use crate::http::{request::Request, Credentials, Method};
 use crate::hyper::{Error, Response};
+use crate::version::VERSION;
 use hyper::{client::connect::Connect, client::HttpConnector, Body, Client, Uri};
 use hyper_tls::HttpsConnector;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -75,6 +76,8 @@ where
             query_string = serializer.finish();
         }
         let mut hyper_request = hyper::Request::builder().method(method);
+        let user_agent = &format!("binance-spot-connector-rust/{}", VERSION);
+        hyper_request = hyper_request.header("User-Agent", user_agent);
         let client_credentials = self.credentials.as_ref();
         let request_credentials = credentials.as_ref();
         if let Some(Credentials { api_key, signature }) = request_credentials.or(client_credentials)
