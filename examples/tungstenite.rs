@@ -19,7 +19,7 @@ fn main() {
         &KlineStream::new("BNBBUSD", KlineInterval::Minutes3).into(),
     ]);
     // Read messages
-    while let Ok(message) = conn.as_mut().read_message() {
+    while let Ok(message) = conn.as_mut().read() {
         let data = message.into_data();
         let string_data = String::from_utf8(data).expect("Found invalid UTF-8 chars");
         log::info!("{}", &string_data);

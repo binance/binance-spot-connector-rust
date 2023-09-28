@@ -1,6 +1,6 @@
 [package]
 name = "binance_spot_connector_rust"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["Binance"]
 edition = "2021"
 resolver = "2"
@@ -45,7 +45,7 @@ futures-util = {version = "0.3.21", optional = true }
 tokio = { version = "1", features = ["time"], optional = true }
 
 # enable-tungstenite
-tungstenite = {version = "0.16.0", features = ["native-tls"], optional = true}
+tungstenite = {version = "0.20.1", features = ["native-tls"], optional = true}
 
 # enable-tokio-tungstenite
 tokio-tungstenite = {version = "0.17.1", features = ["native-tls"], optional = true}
