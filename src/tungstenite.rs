@@ -56,7 +56,7 @@ impl<T: Read + Write> WebSocketState<T> {
         let message = Message::Text(s);
         log::debug!("Sent {}", message);
 
-        self.socket.write_message(message).unwrap();
+        self.socket.send(message).unwrap();
 
         self.id += 1;
         self.id
