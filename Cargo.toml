@@ -17,7 +17,7 @@ default = ["enable-ureq", "enable-tungstenite"]
 enable-hyper = [ "hyper", "hyper-tls", "serde_json", "futures-util", "tokio" ]
 enable-ureq = [ "ureq", "serde_json" ]
 enable-tungstenite = ["tungstenite"]
-enable-tokio-tungstenite = ["tokio-tungstenite"]
+enable-tokio-tungstenite = ["tokio-tungstenite", "futures-util", "tokio"]
 full = ["enable-hyper", "enable-tungstenite", "enable-ureq", "enable-tokio-tungstenite"]
 
 [dependencies]
