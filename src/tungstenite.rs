@@ -82,6 +82,11 @@ impl<T: Read + Write> WebSocketState<T> {
         self.send("SUBSCRIBE", streams.into_iter().map(|s| s.as_str()))
     }
 
+    pub fn subscribe_from_slice(&mut self, streams: &[Stream]) -> u64
+    {
+        self.send("SUBSCRIBE", streams.iter().map(|s| s.as_str()))
+    }
+
     /// Sends `UNSUBSCRIBE` message for the given `streams`.
     ///
     /// `streams` are not validated. Non-existing streams will be
