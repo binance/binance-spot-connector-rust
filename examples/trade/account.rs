@@ -22,23 +22,11 @@ async fn main() -> Result<(), Error> {
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
 
-    // // Signature by RSA key
-    let private_key_file = "/Users/john/ssl/Private_key.pem";
+    // Ed25519 signature
     let the_api_key = "";
-    let private_key = fs::read_to_string(private_key_file).expect("Failed to read the private key");
-    let credentials = Credentials::from_rsa(the_api_key, private_key);
-    let client =
-        BinanceHttpClient::with_url("https://testnet.binance.vision").credentials(credentials);
-    let request = trade::account();
-    let data = client.send(request).await?.into_body_str().await?;
-    log::info!("{}", data);
-
-    // Signature by encrypted RSA key
-    let private_key_file = "/Users/john/ssl/private_key_encrypted.pem";
-    let the_api_key = "the_api_key";
-    let rsa_key_password = "password";
-    let private_key = fs::read_to_string(private_key_file).expect("Failed to read the private key");
-    let credentials = Credentials::from_rsa_protected(the_api_key, private_key, rsa_key_password);
+    let private_key_path = "/Users/john/ssl/private_key_encrypted.pem";
+    let private_key = fs::read_to_string(private_key_path).expect("Failed to read the private key");
+    let credentials = Credentials::from_ed25519(the_api_key, private_key);
     let client =
         BinanceHttpClient::with_url("https://testnet.binance.vision").credentials(credentials);
     let request = trade::account();

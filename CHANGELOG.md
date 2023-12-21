@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.0 - 2023-12-21
+
+### Updated
+- Remove `rsa` due to Marvin Attack vulnerability
+- Add `ed25519` signature
+- Upgraded `signature` to version `2.2.0`
+
 ## 1.0.2 - 2023-09-28
 
 ### Updated

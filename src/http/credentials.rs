@@ -17,7 +17,7 @@ pub struct Credentials {
 #[derive(PartialEq, Eq, Clone)]
 pub enum Signature {
     Hmac(HmacSignature),
-    Rsa(RsaSignature),
+    Ed25519(Ed25519Signature),
 }
 
 #[derive(PartialEq, Eq, Clone)]
@@ -31,35 +31,25 @@ pub struct RsaSignature {
     pub password: Option<String>,
 }
 
+#[derive(PartialEq, Eq, Clone)]
+pub struct Ed25519Signature {
+    pub key: String,
+}
+
 impl Credentials {
-    pub fn from_rsa(api_key: impl Into<String>, key: impl Into<String>) -> Self {
-        Credentials {
-            api_key: api_key.into(),
-            signature: Signature::Rsa(RsaSignature {
-                key: key.into(),
-                password: None,
-            }),
-        }
-    }
-    pub fn from_rsa_protected(
-        api_key: impl Into<String>,
-        key: impl Into<String>,
-        password: impl Into<String>,
-    ) -> Self {
-        Credentials {
-            api_key: api_key.into(),
-            signature: Signature::Rsa(RsaSignature {
-                key: key.into(),
-                password: Some(password.into()),
-            }),
-        }
-    }
     pub fn from_hmac(api_key: impl Into<String>, api_secret: impl Into<String>) -> Self {
         Credentials {
             api_key: api_key.into(),
             signature: Signature::Hmac(HmacSignature {
                 api_secret: api_secret.into(),
             }),
+        }
+    }
+
+    pub fn from_ed25519(api_key: impl Into<String>, key: impl Into<String>) -> Self {
+        Credentials {
+            api_key: api_key.into(),
+            signature: Signature::Ed25519(Ed25519Signature { key: key.into() }),
         }
     }
 }
