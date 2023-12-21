@@ -11,6 +11,7 @@ This is a lightweight library that works as a connector to [Binance public API](
 - Customizable base URL and request timeout
 - Blocking and Non-blocking clients
 - Response Metadata
+- Supports HMAC and ED25519 authentications but not RSA authentication.
 
 ## RESTful APIs
 
