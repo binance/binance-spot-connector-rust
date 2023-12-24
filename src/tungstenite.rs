@@ -82,6 +82,49 @@ impl<T: Read + Write> WebSocketState<T> {
         self.send("SUBSCRIBE", streams.into_iter().map(|s| s.as_str()))
     }
 
+    /// Sends `SUBSCRIBE` message for the given `streams` slice.
+    ///
+    /// `streams` are not validated. Invalid streams will be
+    /// accepted by the server, but no data will be sent.
+    /// Requests to subscribe an existing stream will be ignored
+    /// by the server.
+    ///
+    /// Returns the message `id`. This should be used to match
+    /// the request with a future response. Sent messages should
+    /// not share the same message `id`.
+    ///
+    /// You should expect the server to respond with a similar
+    /// message.
+    /// ```json
+    /// { "method": "SUBSCRIBE", "params": [ <streams> ], "id": <id> }
+    /// ```
+    ///
+    /// # Example
+    /// ```rust
+    /// use binance_spot_connector_rust::{
+    ///     market_stream::book_ticker::BookTickerStream,
+    ///     tungstenite::BinanceWebSocketClient,
+    /// };
+    /// let stream_adr = "wss://stream.binance.com:9443/ws";
+    /// let mut conn = BinanceWebSocketClient::connect_with_url(stream_adr).unwrap();
+    ///
+    ///  let symbol_lst = vec!["BTCUSDT", "BNBBUSD"];
+    ///  let lst = symbol_lst.iter()
+    ///     .map(|x| BookTickerStream::from_symbol(&x).into())
+    ///     .collect::<Vec<_>>()
+    ///   ;
+    ///   conn.subscribe_from_slice(&lst);
+    ///  while let Ok(message) = conn.as_mut().read() {
+    ///    let data = message.into_data();
+    ///    let string_data = unsafe { String::from_utf8_unchecked(data) };
+    ///    assert!(string_data.len() > 0);
+    ///  }
+    /// ```
+    pub fn subscribe_from_slice(&mut self, streams: &[Stream]) -> u64
+    {
+        self.send("SUBSCRIBE", streams.iter().map(|s| s.as_str()))
+    }
+
     /// Sends `UNSUBSCRIBE` message for the given `streams`.
     ///
     /// `streams` are not validated. Non-existing streams will be
