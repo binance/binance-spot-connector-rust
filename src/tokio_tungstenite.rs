@@ -1,5 +1,6 @@
 use crate::websocket::Stream;
-use futures_util::SinkExt;
+use futures_util::stream::{SplitSink, SplitStream};
+use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::TcpStream;
 use tokio_tungstenite::{
@@ -15,7 +16,14 @@ pub struct BinanceWebSocketClient;
 impl BinanceWebSocketClient {
     pub async fn connect_async(
         url: &str,
-    ) -> Result<(WebSocketState<MaybeTlsStream<TcpStream>>, Response), Error> {
+    ) -> Result<
+        (
+            WebSocketState<MaybeTlsStream<TcpStream>>,
+            WebSocketReader<MaybeTlsStream<TcpStream>>,
+            Response,
+        ),
+        Error,
+    > {
         let (socket, response) = connect_async(Url::parse(&url).unwrap()).await?;
 
         log::info!("Connected to {}", url);
@@ -25,22 +33,33 @@ impl BinanceWebSocketClient {
             log::debug!("* {}", header);
         }
 
-        Ok((WebSocketState::new(socket), response))
+        let (sink, stream) = socket.split();
+
+        Ok((WebSocketState::new(sink), stream, response))
     }
 
-    pub async fn connect_async_default(
-    ) -> Result<(WebSocketState<MaybeTlsStream<TcpStream>>, Response), Error> {
+    pub async fn connect_async_default() -> Result<
+        (
+            WebSocketState<MaybeTlsStream<TcpStream>>,
+            WebSocketReader<MaybeTlsStream<TcpStream>>,
+            Response,
+        ),
+        Error,
+    > {
         BinanceWebSocketClient::connect_async("wss://stream.binance.com:9443/stream").await
     }
 }
 
+pub type WebSocketWriter<T> = SplitSink<WebSocketStream<T>, tokio_tungstenite::tungstenite::Message>;
+pub type WebSocketReader<T> = SplitStream<WebSocketStream<T>>;
+
 pub struct WebSocketState<T> {
-    socket: WebSocketStream<T>,
+    socket: WebSocketWriter<T>,
     id: u64,
 }
 
 impl<T: AsyncRead + AsyncWrite + Unpin> WebSocketState<T> {
-    pub fn new(socket: WebSocketStream<T>) -> Self {
+    pub fn new(socket: WebSocketWriter<T>) -> Self {
         Self { socket, id: 0 }
     }
 
@@ -128,18 +147,6 @@ impl<T: AsyncRead + AsyncWrite + Unpin> WebSocketState<T> {
     }
 
     pub async fn close(mut self) -> Result<(), Error> {
-        self.socket.close(None).await
-    }
-}
-
-impl<T> From<WebSocketState<T>> for WebSocketStream<T> {
-    fn from(conn: WebSocketState<T>) -> WebSocketStream<T> {
-        conn.socket
-    }
-}
-
-impl<T> AsMut<WebSocketStream<T>> for WebSocketState<T> {
-    fn as_mut(&mut self) -> &mut WebSocketStream<T> {
-        &mut self.socket
+        self.socket.close().await
     }
 }
