@@ -79,7 +79,7 @@
 
 mod utils;
 mod version;
-mod websocket;
+pub mod websocket;
 
 #[cfg(feature = "enable-tokio-tungstenite")]
 pub mod tokio_tungstenite;
