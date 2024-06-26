@@ -17,7 +17,7 @@ default = ["enable-ureq", "enable-tungstenite"]
 enable-hyper = [ "hyper", "hyper-tls", "serde_json", "futures-util", "tokio" ]
 enable-ureq = [ "ureq", "serde_json" ]
 enable-tungstenite = ["tungstenite"]
-enable-tokio-tungstenite = ["tokio-tungstenite"]
+enable-tokio-tungstenite = ["tokio-tungstenite", "futures-util", "tokio"]
 full = ["enable-hyper", "enable-tungstenite", "enable-ureq", "enable-tokio-tungstenite"]
 
 [dependencies]
@@ -28,10 +28,10 @@ sha2 = { version = "0.10.6", default-features = false, features = ["oid"] }
 url = "2.2.2"
 rust_decimal = "1.24.0"
 http = "0.2.7"
-strum = { version = "0.24", features = ["derive"] }
+strum = { version = "0.26.2", features = ["derive"] }
 rand = "0.8.5"
 signature = "2.2.0"
-base64 = "0.13.1"
+base64 = "0.22.1"
 ed25519-dalek = { version = "2.1.0", features = ["serde", "zeroize", "rand_core", "digest", "pkcs8", "pem"] }
 
 # enable-ureq
@@ -45,14 +45,14 @@ futures-util = {version = "0.3.21", optional = true }
 tokio = { version = "1", features = ["time"], optional = true }
 
 # enable-tungstenite
-tungstenite = {version = "0.20.1", features = ["native-tls"], optional = true}
+tungstenite = {version = "0.23.0", features = ["native-tls"], optional = true}
 
 # enable-tokio-tungstenite
-tokio-tungstenite = {version = "0.17.1", features = ["native-tls"], optional = true}
+tokio-tungstenite = {version = "0.23.1", features = ["native-tls"], optional = true}
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
-env_logger = "0.10.0"
+env_logger = "0.11.3"
 tower = "0.4.12"
 rust_decimal_macros = "1.24.0"
-cargo-audit = "0.17.4"
+cargo-audit = "0.20.0"

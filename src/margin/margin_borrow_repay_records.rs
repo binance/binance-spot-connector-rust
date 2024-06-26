@@ -1,42 +1,47 @@
 use crate::http::{request::Request, Credentials, Method};
 
-/// `GET /sapi/v1/margin/isolated/transfer`
+/// `GET /sapi/v1/margin/borrow-repay`
 ///
-/// Weight(IP): 1
+/// Query borrow/repay records in Margin account
+///
+/// * txId or startTime must be sent. txId takes precedence. Response in descending order
+/// * If an asset is sent, data within 30 days before endTime; If an asset is not sent, data within 7 days before endTime
+/// * If neither startTime nor endTime is sent, the recent 7-day data will be returned.
+/// * startTime set as endTime - 7days by default, endTime set as current time by default
+///
+/// Weight(IP): 10
 ///
 /// # Example
 ///
 /// ```
 /// use binance_spot_connector_rust::margin;
 ///
-/// let request = margin::isolated_margin_transfer_history("BNBUSDT").asset("BNB").trans_from("SPOT").trans_to("ISOLATED_MARGIN").current(1).size(100);
+/// let request = margin::margin_borrow_repay_records("BORROW");
 /// ```
-pub struct IsolatedMarginTransferHistory {
-    symbol: String,
+pub struct MarginBorrowRepayRecords {
+    type_: String,
     asset: Option<String>,
-    trans_from: Option<String>,
-    trans_to: Option<String>,
+    isolated_symbol: Option<String>,
+    tx_id: Option<u64>,
     start_time: Option<u64>,
     end_time: Option<u64>,
     current: Option<u64>,
     size: Option<u64>,
-    archived: Option<bool>,
     recv_window: Option<u64>,
     credentials: Option<Credentials>,
 }
 
-impl IsolatedMarginTransferHistory {
-    pub fn new(symbol: &str) -> Self {
+impl MarginBorrowRepayRecords {
+    pub fn new(type_: &str) -> Self {
         Self {
-            symbol: symbol.to_owned(),
+            type_: type_.to_owned(),
             asset: None,
-            trans_from: None,
-            trans_to: None,
+            isolated_symbol: None,
+            tx_id: None,
             start_time: None,
             end_time: None,
             current: None,
             size: None,
-            archived: None,
             recv_window: None,
             credentials: None,
         }
@@ -47,13 +52,13 @@ impl IsolatedMarginTransferHistory {
         self
     }
 
-    pub fn trans_from(mut self, trans_from: &str) -> Self {
-        self.trans_from = Some(trans_from.to_owned());
+    pub fn isolated_symbol(mut self, isolated_symbol: &str) -> Self {
+        self.isolated_symbol = Some(isolated_symbol.to_owned());
         self
     }
 
-    pub fn trans_to(mut self, trans_to: &str) -> Self {
-        self.trans_to = Some(trans_to.to_owned());
+    pub fn tx_id(mut self, tx_id: u64) -> Self {
+        self.tx_id = Some(tx_id);
         self
     }
 
@@ -77,11 +82,6 @@ impl IsolatedMarginTransferHistory {
         self
     }
 
-    pub fn archived(mut self, archived: bool) -> Self {
-        self.archived = Some(archived);
-        self
-    }
-
     pub fn recv_window(mut self, recv_window: u64) -> Self {
         self.recv_window = Some(recv_window);
         self
@@ -93,28 +93,28 @@ impl IsolatedMarginTransferHistory {
     }
 }
 
-impl From<IsolatedMarginTransferHistory> for Request {
-    fn from(request: IsolatedMarginTransferHistory) -> Request {
-        let mut params = vec![("symbol".to_owned(), request.symbol.to_string())];
+impl From<MarginBorrowRepayRecords> for Request {
+    fn from(request: MarginBorrowRepayRecords) -> Request {
+        let mut params = vec![("type".to_owned(), request.type_.to_string())];
 
         if let Some(asset) = request.asset {
             params.push(("asset".to_owned(), asset));
         }
 
-        if let Some(trans_from) = request.trans_from {
-            params.push(("transFrom".to_owned(), trans_from));
+        if let Some(isolated_symbol) = request.isolated_symbol {
+            params.push(("isolated_symbol".to_owned(), isolated_symbol));
         }
 
-        if let Some(trans_to) = request.trans_to {
-            params.push(("transTo".to_owned(), trans_to));
+        if let Some(tx_id) = request.tx_id {
+            params.push(("tx_id".to_owned(), tx_id.to_string()));
         }
 
         if let Some(start_time) = request.start_time {
-            params.push(("startTime".to_owned(), start_time.to_string()));
+            params.push(("start_time".to_owned(), start_time.to_string()));
         }
 
         if let Some(end_time) = request.end_time {
-            params.push(("endTime".to_owned(), end_time.to_string()));
+            params.push(("end_time".to_owned(), end_time.to_string()));
         }
 
         if let Some(current) = request.current {
@@ -125,16 +125,12 @@ impl From<IsolatedMarginTransferHistory> for Request {
             params.push(("size".to_owned(), size.to_string()));
         }
 
-        if let Some(archived) = request.archived {
-            params.push(("archived".to_owned(), archived.to_string()));
-        }
-
         if let Some(recv_window) = request.recv_window {
             params.push(("recvWindow".to_owned(), recv_window.to_string()));
         }
 
         Request {
-            path: "/sapi/v1/margin/isolated/transfer".to_owned(),
+            path: "/sapi/v1/margin/borrow-repay".to_owned(),
             method: Method::Get,
             params,
             credentials: request.credentials,
@@ -145,22 +141,17 @@ impl From<IsolatedMarginTransferHistory> for Request {
 
 #[cfg(test)]
 mod tests {
-    use super::IsolatedMarginTransferHistory;
+    use super::MarginBorrowRepayRecords;
     use crate::http::{request::Request, Credentials, Method};
 
     static API_KEY: &str = "api-key";
     static API_SECRET: &str = "api-secret";
 
     #[test]
-    fn margin_isolated_margin_transfer_history_convert_to_request_test() {
+    fn margin_borrow_repay_records_convert_to_request_test() {
         let credentials = Credentials::from_hmac(API_KEY.to_owned(), API_SECRET.to_owned());
 
-        let request: Request = IsolatedMarginTransferHistory::new("BNBUSDT")
-            .asset("BNB")
-            .trans_from("SPOT")
-            .trans_to("ISOLATED_MARGIN")
-            .current(1)
-            .size(100)
+        let request: Request = MarginBorrowRepayRecords::new("BORROW")
             .recv_window(5000)
             .credentials(&credentials)
             .into();
@@ -168,16 +159,11 @@ mod tests {
         assert_eq!(
             request,
             Request {
-                path: "/sapi/v1/margin/isolated/transfer".to_owned(),
+                path: "/sapi/v1/margin/borrow-repay".to_owned(),
                 credentials: Some(credentials),
                 method: Method::Get,
                 params: vec![
-                    ("symbol".to_owned(), "BNBUSDT".to_string()),
-                    ("asset".to_owned(), "BNB".to_string()),
-                    ("transFrom".to_owned(), "SPOT".to_string()),
-                    ("transTo".to_owned(), "ISOLATED_MARGIN".to_string()),
-                    ("current".to_owned(), "1".to_string()),
-                    ("size".to_owned(), "100".to_string()),
+                    ("type".to_owned(), "BORROW".to_string()),
                     ("recvWindow".to_owned(), "5000".to_string()),
                 ],
                 sign: true

@@ -33,7 +33,7 @@
 //! ```no_run
 //! use binance_spot_connector_rust::tungstenite::BinanceWebSocketClient;
 //!
-//! let testnet_websocket_client = BinanceWebSocketClient::connect_with_url("wss://testnet.binance.vision/ws");
+//! let testnet_websocket_client = BinanceWebSocketClient::connect_with_url("wss://stream.testnet.binance.vision/ws");
 //! ```
 //!
 //! # Logging

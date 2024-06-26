@@ -2,14 +2,13 @@ use crate::websocket::Stream;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use tungstenite::{connect, stream::MaybeTlsStream, Error, Message, WebSocket};
-use url::Url;
 
 /// Binance websocket client using Tungstenite.
 pub struct BinanceWebSocketClient;
 
 impl BinanceWebSocketClient {
     pub fn connect_with_url(url: &str) -> Result<WebSocketState<MaybeTlsStream<TcpStream>>, Error> {
-        let (socket, response) = connect(Url::parse(url).unwrap())?;
+        let (socket, response) = connect(url)?;
 
         log::info!("Connected to {}", url);
         log::debug!("Response HTTP code: {}", response.status());
@@ -80,6 +79,26 @@ impl<T: Read + Write> WebSocketState<T> {
     /// ```
     pub fn subscribe<'a>(&mut self, streams: impl IntoIterator<Item = &'a Stream>) -> u64 {
         self.send("SUBSCRIBE", streams.into_iter().map(|s| s.as_str()))
+    }
+
+    /// Sends `SUBSCRIBE` message for the given `streams` slice.
+    ///
+    /// `streams` are not validated. Invalid streams will be
+    /// accepted by the server, but no data will be sent.
+    /// Requests to subscribe an existing stream will be ignored
+    /// by the server.
+    ///
+    /// Returns the message `id`. This should be used to match
+    /// the request with a future response. Sent messages should
+    /// not share the same message `id`.
+    ///
+    /// You should expect the server to respond with a similar
+    /// message.
+    /// ```json
+    /// { "method": "SUBSCRIBE", "params": [ <streams> ], "id": <id> }
+    /// ```
+    pub fn subscribe_from_slice(&mut self, streams: &[Stream]) -> u64 {
+        self.send("SUBSCRIBE", streams.iter().map(|s| s.as_str()))
     }
 
     /// Sends `UNSUBSCRIBE` message for the given `streams`.
