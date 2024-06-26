@@ -2,14 +2,13 @@ use crate::websocket::Stream;
 use std::io::{Read, Write};
 use std::net::TcpStream;
 use tungstenite::{connect, stream::MaybeTlsStream, Error, Message, WebSocket};
-use url::Url;
 
 /// Binance websocket client using Tungstenite.
 pub struct BinanceWebSocketClient;
 
 impl BinanceWebSocketClient {
     pub fn connect_with_url(url: &str) -> Result<WebSocketState<MaybeTlsStream<TcpStream>>, Error> {
-        let (socket, response) = connect(Url::parse(url).unwrap())?;
+        let (socket, response) = connect(url)?;
 
         log::info!("Connected to {}", url);
         log::debug!("Response HTTP code: {}", response.status());
@@ -98,30 +97,7 @@ impl<T: Read + Write> WebSocketState<T> {
     /// ```json
     /// { "method": "SUBSCRIBE", "params": [ <streams> ], "id": <id> }
     /// ```
-    ///
-    /// # Example
-    /// ```rust
-    /// use binance_spot_connector_rust::{
-    ///     market_stream::book_ticker::BookTickerStream,
-    ///     tungstenite::BinanceWebSocketClient,
-    /// };
-    /// let stream_adr = "wss://stream.binance.com:9443/ws";
-    /// let mut conn = BinanceWebSocketClient::connect_with_url(stream_adr).unwrap();
-    ///
-    ///  let symbol_lst = vec!["BTCUSDT", "BNBBUSD"];
-    ///  let lst = symbol_lst.iter()
-    ///     .map(|x| BookTickerStream::from_symbol(&x).into())
-    ///     .collect::<Vec<_>>()
-    ///   ;
-    ///   conn.subscribe_from_slice(&lst);
-    ///  while let Ok(message) = conn.as_mut().read() {
-    ///    let data = message.into_data();
-    ///    let string_data = unsafe { String::from_utf8_unchecked(data) };
-    ///    assert!(string_data.len() > 0);
-    ///  }
-    /// ```
-    pub fn subscribe_from_slice(&mut self, streams: &[Stream]) -> u64
-    {
+    pub fn subscribe_from_slice(&mut self, streams: &[Stream]) -> u64 {
         self.send("SUBSCRIBE", streams.iter().map(|s| s.as_str()))
     }
 

@@ -120,6 +120,7 @@ where
             .await
             .map_err(|err| Error::Send(err))?;
         log::debug!("{}", response.status());
+
         Ok(Response::from(response))
     }
 }

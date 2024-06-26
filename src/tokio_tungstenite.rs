@@ -7,7 +7,6 @@ use tokio_tungstenite::{
     tungstenite::{handshake::client::Response, protocol::Message, Error},
     MaybeTlsStream, WebSocketStream,
 };
-use url::Url;
 
 /// Binance websocket client using Tungstenite.
 pub struct BinanceWebSocketClient;
@@ -16,7 +15,7 @@ impl BinanceWebSocketClient {
     pub async fn connect_async(
         url: &str,
     ) -> Result<(WebSocketState<MaybeTlsStream<TcpStream>>, Response), Error> {
-        let (socket, response) = connect_async(Url::parse(&url).unwrap()).await?;
+        let (socket, response) = connect_async(url).await?;
 
         log::info!("Connected to {}", url);
         log::debug!("Response HTTP code: {}", response.status());

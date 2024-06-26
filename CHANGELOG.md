@@ -6,8 +6,17 @@
 - Margin endpoints
   - `POST /sapi/v1/margin/borrow-repay`
   - `GET /sapi/v1/margin/borrow-repay`
+- Implemented subscription from slice of Streams
+- Added features `futures-util` and `tokio` to `enable-tokio-tungstenite`
+- Enabled `binance_tokio_client` to be used within `async` context and `Tokio::Spawn` runtime
 
 ### Updated
+- Upgraded following dependencies:
+  - `strum` to version `0.26.2`
+  - `base64` to version `0.22.1`
+  - `tungstenite` to version `0.23.0`
+  - `env_logger` to version `0.11.3`
+  - `cargo-audit` to version `0.20.0`
 - Margin endpoints
   - `GET /sapi/v1/margin/transfer`: add parameter `isolatedSymbol`
   - `GET /sapi/v1/margin/allAssets`: add parameter `asset`
