@@ -12,12 +12,21 @@ use crate::http::{request::Request, Credentials, Method};
 /// let request = margin::margin_all_pairs();
 /// ```
 pub struct MarginAllPairs {
+    symbol: Option<String>,
     credentials: Option<Credentials>,
 }
 
 impl MarginAllPairs {
     pub fn new() -> Self {
-        Self { credentials: None }
+        Self {
+            symbol: None,
+            credentials: None,
+        }
+    }
+
+    pub fn symbol(mut self, symbol: &str) -> Self {
+        self.symbol = Some(symbol.to_owned());
+        self
     }
 
     pub fn credentials(mut self, credentials: &Credentials) -> Self {

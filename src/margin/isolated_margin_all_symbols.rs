@@ -12,6 +12,7 @@ use crate::http::{request::Request, Credentials, Method};
 /// let request = margin::isolated_margin_all_symbols();
 /// ```
 pub struct IsolatedMarginAllSymbols {
+    symbol: Option<String>,
     recv_window: Option<u64>,
     credentials: Option<Credentials>,
 }
@@ -19,9 +20,15 @@ pub struct IsolatedMarginAllSymbols {
 impl IsolatedMarginAllSymbols {
     pub fn new() -> Self {
         Self {
+            symbol: None,
             recv_window: None,
             credentials: None,
         }
+    }
+
+    pub fn symbol(mut self, symbol: &str) -> Self {
+        self.symbol = Some(symbol.to_owned());
+        self
     }
 
     pub fn recv_window(mut self, recv_window: u64) -> Self {

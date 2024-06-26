@@ -1,42 +1,36 @@
 use crate::http::{request::Request, Credentials, Method};
-use rust_decimal::Decimal;
 
-/// `POST /sapi/v1/margin/isolated/transfer`
+/// `POST /sapi/v1/margin/borrow-repay`
 ///
-/// Weight(UID): 600
+/// Margin account borrow/repay(MARGIN)
+///
+/// Weight(UID): 1500
 ///
 /// # Example
 ///
 /// ```
 /// use binance_spot_connector_rust::margin;
-/// use rust_decimal_macros::dec;
 ///
-/// let request = margin::isolated_margin_transfer("BTC", "BNBUSDT", "SPOT", "ISOLATED_MARGIN", dec!(1.01));
+/// let request = margin::margin_account_borrow_repay("BNB", "FALSE", "BNBUSDT", "1.0", "BORROW");
 /// ```
-pub struct IsolatedMarginTransfer {
+pub struct MarginAccountBorrowRepay {
     asset: String,
+    is_isolated: String,
     symbol: String,
-    trans_from: String,
-    trans_to: String,
-    amount: Decimal,
+    amount: String,
+    type_: String,
     recv_window: Option<u64>,
     credentials: Option<Credentials>,
 }
 
-impl IsolatedMarginTransfer {
-    pub fn new(
-        asset: &str,
-        symbol: &str,
-        trans_from: &str,
-        trans_to: &str,
-        amount: Decimal,
-    ) -> Self {
+impl MarginAccountBorrowRepay {
+    pub fn new(asset: &str, is_isolated: &str, symbol: &str, amount: &str, type_: &str) -> Self {
         Self {
             asset: asset.to_owned(),
+            is_isolated: is_isolated.to_owned(),
             symbol: symbol.to_owned(),
-            trans_from: trans_from.to_owned(),
-            trans_to: trans_to.to_owned(),
-            amount,
+            amount: amount.to_owned(),
+            type_: type_.to_owned(),
             recv_window: None,
             credentials: None,
         }
@@ -53,14 +47,14 @@ impl IsolatedMarginTransfer {
     }
 }
 
-impl From<IsolatedMarginTransfer> for Request {
-    fn from(request: IsolatedMarginTransfer) -> Request {
+impl From<MarginAccountBorrowRepay> for Request {
+    fn from(request: MarginAccountBorrowRepay) -> Request {
         let mut params = vec![
             ("asset".to_owned(), request.asset.to_string()),
+            ("isIsolated".to_owned(), request.is_isolated.to_string()),
             ("symbol".to_owned(), request.symbol.to_string()),
-            ("transFrom".to_owned(), request.trans_from.to_string()),
-            ("transTo".to_owned(), request.trans_to.to_string()),
             ("amount".to_owned(), request.amount.to_string()),
+            ("type".to_owned(), request.type_.to_string()),
         ];
 
         if let Some(recv_window) = request.recv_window {
@@ -68,7 +62,7 @@ impl From<IsolatedMarginTransfer> for Request {
         }
 
         Request {
-            path: "/sapi/v1/margin/isolated/transfer".to_owned(),
+            path: "/sapi/v1/margin/borrow-repay".to_owned(),
             method: Method::Post,
             params,
             credentials: request.credentials,
@@ -79,19 +73,18 @@ impl From<IsolatedMarginTransfer> for Request {
 
 #[cfg(test)]
 mod tests {
-    use super::IsolatedMarginTransfer;
+    use super::MarginAccountBorrowRepay;
     use crate::http::{request::Request, Credentials, Method};
-    use rust_decimal_macros::dec;
 
     static API_KEY: &str = "api-key";
     static API_SECRET: &str = "api-secret";
 
     #[test]
-    fn margin_isolated_margin_transfer_convert_to_request_test() {
+    fn margin_account_borrow_repay_convert_to_request_test() {
         let credentials = Credentials::from_hmac(API_KEY.to_owned(), API_SECRET.to_owned());
 
         let request: Request =
-            IsolatedMarginTransfer::new("BTC", "BNBUSDT", "SPOT", "ISOLATED_MARGIN", dec!(1.01))
+            MarginAccountBorrowRepay::new("BNB", "FALSE", "BNBUSDT", "1.0", "BORROW")
                 .recv_window(5000)
                 .credentials(&credentials)
                 .into();
@@ -99,15 +92,15 @@ mod tests {
         assert_eq!(
             request,
             Request {
-                path: "/sapi/v1/margin/isolated/transfer".to_owned(),
+                path: "/sapi/v1/margin/borrow-repay".to_owned(),
                 credentials: Some(credentials),
                 method: Method::Post,
                 params: vec![
-                    ("asset".to_owned(), "BTC".to_string()),
+                    ("asset".to_owned(), "BNB".to_string()),
+                    ("isIsolated".to_owned(), "FALSE".to_string()),
                     ("symbol".to_owned(), "BNBUSDT".to_string()),
-                    ("transFrom".to_owned(), "SPOT".to_string()),
-                    ("transTo".to_owned(), "ISOLATED_MARGIN".to_string()),
-                    ("amount".to_owned(), "1.01".to_string()),
+                    ("amount".to_owned(), "1.0".to_string()),
+                    ("type".to_owned(), "BORROW".to_string()),
                     ("recvWindow".to_owned(), "5000".to_string()),
                 ],
                 sign: true

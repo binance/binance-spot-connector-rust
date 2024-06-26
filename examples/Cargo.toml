@@ -9,7 +9,7 @@ binance_spot_connector_rust = { path = "..", features = ["full"]}
 log = "0.4.14"
 tokio = { version = "1", features = ["full"] }
 futures-util = "0.3.21"
-env_logger = "0.9.0"
+env_logger = "0.11.3"
 rust_decimal = "1.24.0"
 rust_decimal_macros = "1.24.0"
 
@@ -146,36 +146,8 @@ name="trade_order_limit_usage"
 path="trade/order_limit_usage.rs"
 
 [[example]]
-name="margin_margin_transfer"
-path="margin/margin_transfer.rs"
-
-[[example]]
 name="margin_margin_transfer_history"
 path="margin/margin_transfer_history.rs"
-
-[[example]]
-name="margin_margin_borrow"
-path="margin/margin_borrow.rs"
-
-[[example]]
-name="margin_margin_loan_record"
-path="margin/margin_loan_record.rs"
-
-[[example]]
-name="margin_margin_repay"
-path="margin/margin_repay.rs"
-
-[[example]]
-name="margin_margin_repay_record"
-path="margin/margin_repay_record.rs"
-
-[[example]]
-name="margin_margin_asset"
-path="margin/margin_asset.rs"
-
-[[example]]
-name="margin_margin_pair"
-path="margin/margin_pair.rs"
 
 [[example]]
 name="margin_margin_all_assets"
@@ -258,14 +230,6 @@ name="margin_margin_max_transferable"
 path="margin/margin_max_transferable.rs"
 
 [[example]]
-name="margin_isolated_margin_transfer_history"
-path="margin/isolated_margin_transfer_history.rs"
-
-[[example]]
-name="margin_isolated_margin_transfer"
-path="margin/isolated_margin_transfer.rs"
-
-[[example]]
 name="margin_isolated_margin_account"
 path="margin/isolated_margin_account.rs"
 
@@ -280,10 +244,6 @@ path="margin/isolated_margin_enable_account.rs"
 [[example]]
 name="margin_isolated_margin_account_limit"
 path="margin/isolated_margin_account_limit.rs"
-
-[[example]]
-name="margin_isolated_margin_symbol"
-path="margin/isolated_margin_symbol.rs"
 
 [[example]]
 name="margin_isolated_margin_all_symbols"
@@ -316,10 +276,6 @@ path="margin/isolated_margin_tier_data.rs"
 [[example]]
 name="margin_margin_order_count_usage"
 path="margin/margin_order_count_usage.rs"
-
-[[example]]
-name="margin_margin_dustlog"
-path="margin/margin_dustlog.rs"
 
 [[example]]
 name="wallet_system_status"

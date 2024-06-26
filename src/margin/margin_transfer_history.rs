@@ -23,6 +23,7 @@ pub struct MarginTransferHistory {
     current: Option<u32>,
     size: Option<u32>,
     archived: Option<bool>,
+    isolated_symbol: Option<String>,
     recv_window: Option<u64>,
     credentials: Option<Credentials>,
 }
@@ -37,6 +38,7 @@ impl MarginTransferHistory {
             current: None,
             size: None,
             archived: None,
+            isolated_symbol: None,
             recv_window: None,
             credentials: None,
         }
@@ -74,6 +76,11 @@ impl MarginTransferHistory {
 
     pub fn archived(mut self, archived: bool) -> Self {
         self.archived = Some(archived);
+        self
+    }
+
+    pub fn isolated_symbol(mut self, isolated_symbol: &str) -> Self {
+        self.isolated_symbol = Some(isolated_symbol.to_owned());
         self
     }
 
@@ -118,6 +125,10 @@ impl From<MarginTransferHistory> for Request {
 
         if let Some(archived) = request.archived {
             params.push(("archived".to_owned(), archived.to_string()));
+        }
+
+        if let Some(isolated_symbol) = request.isolated_symbol {
+            params.push(("isolatedSymbol".to_owned(), isolated_symbol));
         }
 
         if let Some(recv_window) = request.recv_window {

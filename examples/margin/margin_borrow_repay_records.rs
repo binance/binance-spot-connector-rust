@@ -12,7 +12,8 @@ async fn main() -> Result<(), Error> {
         .init();
     let credentials = Credentials::from_hmac("api-key".to_owned(), "api-secret".to_owned());
     let client = BinanceHttpClient::default().credentials(credentials);
-    let request = margin::margin_pair("BNBUSDT");
+    let request =
+        margin::margin_borrow_repay_records("BORROW");
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())

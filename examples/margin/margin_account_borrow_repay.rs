@@ -4,7 +4,6 @@ use binance_spot_connector_rust::{
     margin,
 };
 use env_logger::Builder;
-use rust_decimal_macros::dec;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -14,7 +13,7 @@ async fn main() -> Result<(), Error> {
     let credentials = Credentials::from_hmac("api-key".to_owned(), "api-secret".to_owned());
     let client = BinanceHttpClient::default().credentials(credentials);
     let request =
-        margin::isolated_margin_transfer("BTC", "BNBUSDT", "SPOT", "ISOLATED_MARGIN", dec!(1.01));
+        margin::margin_account_borrow_repay("BNB", "FALSE", "BNBUSDT", "1.0", "BORROW");
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())
