@@ -40,7 +40,7 @@
   - `GET /sapi/v1/margin/dust`
   - `POST /sapi/v1/margin/dust`
 
-## 1.1.0 - 2023-12-18
+## 1.1.0 - 2023-12-21
 
 ### Updated
 - Remove `rsa` due to Marvin Attack vulnerability
