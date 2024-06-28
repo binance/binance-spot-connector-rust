@@ -22,9 +22,7 @@ fn sign_hmac(payload: &str, key: &str) -> Result<String, InvalidLength> {
 }
 
 fn sign_ed25519(payload: &str, key: &str) -> Result<String, InvalidLength> {
-    let private = SigningKey::from_pkcs8_pem(key);
-
-    let signing_key: SigningKey = SigningKey::from_bytes(&private.unwrap().to_bytes());
+    let signing_key = SigningKey::from_pkcs8_pem(key);
     let signature: Ed25519Signature = signing_key.sign(&payload.to_string().into_bytes());
     Ok(encode(signature.to_bytes()))
 }
