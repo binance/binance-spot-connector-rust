@@ -6,7 +6,7 @@
 /// Note: Production and TESTNET API Credentials are not
 /// interchangeable.
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#api-key-restrictions)
+/// [API Documentation](https://developers.binance.com/docs/rebate/quick-start#api-key-restrictions)
 ///
 #[derive(PartialEq, Eq, Clone)]
 pub struct Credentials {

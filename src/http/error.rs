@@ -36,7 +36,7 @@ impl<T> HttpError<T> {
 pub struct BinanceApiError {
     /// Error code
     ///
-    /// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#error-codes)
+    /// [API Documentation](https://developers.binance.com/docs/margin_trading/error-code)
     #[serde(rename(deserialize = "code"))]
     pub code: i16,
 

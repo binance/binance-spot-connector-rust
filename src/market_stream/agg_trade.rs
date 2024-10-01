@@ -6,7 +6,7 @@ use crate::websocket::Stream;
 ///
 /// Update Speed: Real-time.
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#aggregate-trade-streams)
+/// [API Documentation](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#aggregate-trade-streams)
 ///
 /// # Example
 ///

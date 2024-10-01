@@ -18,7 +18,7 @@ use crate::websocket::Stream;
 /// an OCO, an event will be displayed named `ListStatus` in addition
 /// to the `executionReport` event.
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#user-data-streams)
+/// [API Documentation](https://developers.binance.com/docs/binance-spot-api-docs/user-data-stream)
 pub struct UserDataStream {
     listen_key: String,
 }

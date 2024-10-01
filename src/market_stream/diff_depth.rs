@@ -6,7 +6,7 @@ use crate::websocket::Stream;
 ///
 /// Update Speed: 1000ms or 100ms.
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#partial-book-depth-streams)
+/// [API Documentation](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#partial-book-depth-streams)
 ///
 /// # Example
 ///
