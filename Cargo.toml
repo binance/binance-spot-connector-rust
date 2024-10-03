@@ -1,6 +1,6 @@
 [package]
 name = "binance_spot_connector_rust"
-version = "1.2.0"
+version = "1.2.1"
 authors = ["Binance"]
 edition = "2021"
 resolver = "2"

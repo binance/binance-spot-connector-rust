@@ -1,13 +1,13 @@
 use crate::market::klines::KlineInterval;
 use crate::websocket::Stream;
 
-/// Kline/Candlestick Stream
+/// Kline/Candlestick Streams for UTC
 ///
 /// The Kline/Candlestick Stream push updates to the current klines/candlestick every second.
 ///
 /// Update Speed: 2000ms
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#kline-candlestick-streams)
+/// [API Documentation](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#klinecandlestick-streams-for-utc)
 ///
 /// # Example
 ///

@@ -6,7 +6,7 @@ use crate::websocket::Stream;
 ///
 /// Update Speed: Real-time.
 ///
-/// [API Documentation](https://binance-docs.github.io/apidocs/spot/en/#individual-symbol-book-ticker-streams)
+/// [API Documentation](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams#individual-symbol-book-ticker-streams)
 ///
 /// # Example
 ///

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1 - 2024-10-03
+### Updated
+- Updated url links
+
 ## 1.2.0 - 2024-06-26
 
 ### Added
