@@ -7,8 +7,8 @@ use crate::http::{request::Request, Method};
 /// * If the symbol is not sent, prices for all symbols will be returned in an array.
 ///
 /// Weight(IP):
-/// * `1` for a single symbol;
-/// * `2` when the symbol parameter is omitted;
+/// * `2` for a single symbol;
+/// * `4` when the symbol parameter is omitted;
 ///
 /// # Example
 ///
@@ -79,10 +79,7 @@ mod tests {
 
     #[test]
     fn market_ticker_price_convert_to_request_test() {
-        let request: Request = TickerPrice::new()
-            .symbol("BNBUSDT")
-            .symbols(vec!["BTCUSDT", "BNBBTC"])
-            .into();
+        let request: Request = TickerPrice::new().symbol("BNBUSDT").into();
 
         assert_eq!(
             request,
@@ -90,10 +87,7 @@ mod tests {
                 path: "/api/v3/ticker/price".to_owned(),
                 credentials: None,
                 method: Method::Get,
-                params: vec![
-                    ("symbol".to_owned(), "BNBUSDT".to_string()),
-                    ("symbols".to_owned(), "[\"BTCUSDT\",\"BNBBTC\"]".to_string()),
-                ],
+                params: vec![("symbol".to_owned(), "BNBUSDT".to_string())],
                 sign: false
             }
         );

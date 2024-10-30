@@ -4,7 +4,7 @@ use crate::http::{request::Request, Method};
 ///
 /// Get recent trades.
 ///
-/// Weight(IP): 1
+/// Weight(IP): 25
 ///
 /// # Example
 ///

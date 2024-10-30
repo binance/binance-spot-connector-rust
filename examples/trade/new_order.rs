@@ -12,8 +12,7 @@ async fn main() -> Result<(), Error> {
         .filter(None, log::LevelFilter::Debug)
         .init();
     let credentials = Credentials::from_hmac("the_api_key".to_owned(), "the_api_secret".to_owned());
-    let client =
-        BinanceHttpClient::with_url("https://testnet.binance.vision").credentials(credentials);
+    let client = BinanceHttpClient::default().credentials(credentials);
     let request = trade::new_order("BNBUSDT", Side::Sell, "MARKET").quantity(dec!(0.1));
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);

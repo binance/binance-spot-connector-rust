@@ -107,6 +107,7 @@ use binance_spot_connector_rust::{
     market::klines::KlineInterval, market_stream::kline::KlineStream,
     tokio_tungstenite::BinanceWebSocketClient,
 };
+use std::time::Duration;
 use env_logger::Builder;
 use futures_util::StreamExt;
 
@@ -124,8 +125,15 @@ async fn main() {
         &KlineStream::new("BTCUSDT", KlineInterval::Minutes1).into()
     ])
     .await;
+    // Start a timer for 10 seconds
+    let timer = tokio::time::Instant::now();
+    let duration = Duration::new(10, 0);
     // Read messages
     while let Some(message) = conn.as_mut().next().await {
+        if timer.elapsed() >= duration {
+            log::info!("10 seconds elapsed, exiting loop.");
+            break; // Exit the loop after 10 seconds
+        }
         match message {
             Ok(message) => {
                 let binary_data = message.into_data();

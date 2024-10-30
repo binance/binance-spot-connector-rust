@@ -7,15 +7,15 @@ use crate::http::{request::Request, Method};
 /// * If the symbol is not sent, bookTickers for all symbols will be returned in an array.
 ///
 /// Weight(IP):
-/// * `1` for a single symbol;
-/// * `2` when the symbol parameter is omitted;
+/// * `2` for a single symbol;
+/// * `4` when the symbol parameter is omitted;
 ///
 /// # Example
 ///
 /// ```
 /// use binance_spot_connector_rust::market;
 ///
-/// let request = market::book_ticker().symbol("BNBUSDT").symbols(vec!["BTCUSDT","BNBBTC"]);
+/// let request = market::book_ticker().symbols(vec!["BTCUSDT","BNBBTC"]);
 /// ```
 pub struct BookTicker {
     symbol: Option<String>,
@@ -79,10 +79,7 @@ mod tests {
 
     #[test]
     fn market_book_ticker_convert_to_request_test() {
-        let request: Request = BookTicker::new()
-            .symbol("BNBUSDT")
-            .symbols(vec!["BTCUSDT", "BNBBTC"])
-            .into();
+        let request: Request = BookTicker::new().symbols(vec!["BTCUSDT", "BNBBTC"]).into();
 
         assert_eq!(
             request,
@@ -90,10 +87,7 @@ mod tests {
                 path: "/api/v3/ticker/bookTicker".to_owned(),
                 credentials: None,
                 method: Method::Get,
-                params: vec![
-                    ("symbol".to_owned(), "BNBUSDT".to_string()),
-                    ("symbols".to_owned(), "[\"BTCUSDT\",\"BNBBTC\"]".to_string()),
-                ],
+                params: vec![("symbols".to_owned(), "[\"BTCUSDT\",\"BNBBTC\"]".to_string())],
                 sign: false
             }
         );

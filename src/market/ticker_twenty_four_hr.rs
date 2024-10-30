@@ -1,4 +1,5 @@
 use crate::http::{request::Request, Method};
+use crate::market::rolling_window_price_change_statistics::TickerType;
 
 /// `GET /api/v3/ticker/24hr`
 ///
@@ -7,19 +8,24 @@ use crate::http::{request::Request, Method};
 /// * If the symbol is not sent, tickers for all symbols will be returned in an array.
 ///
 /// Weight(IP):
-/// * `1` for a single symbol;
-/// * `40` when the symbol parameter is omitted;
+/// * `2` for a single symbol;
+/// * `2` for 1-20 `symbols` sent;
+/// * `40` for 21-100 `symbols` sent;
+/// * `80` for 101 or more `symbols` sent;
+/// * `80` when the symbol parameter is omitted;
+/// * `80` when the symbols parameter is omitted;
 ///
 /// # Example
 ///
 /// ```
 /// use binance_spot_connector_rust::market;
 ///
-/// let request = market::ticker_twenty_four_hr().symbol("BNBUSDT").symbols(vec!["BTCUSDT","BNBBTC"]);
+/// let request = market::ticker_twenty_four_hr().symbols(vec!["BTCUSDT","BNBBTC"]);
 /// ```
 pub struct Ticker24hr {
     symbol: Option<String>,
     symbols: Option<Vec<String>>,
+    ticker_type: Option<TickerType>,
 }
 
 impl Ticker24hr {
@@ -27,6 +33,7 @@ impl Ticker24hr {
         Self {
             symbol: None,
             symbols: None,
+            ticker_type: None,
         }
     }
 
@@ -37,6 +44,11 @@ impl Ticker24hr {
 
     pub fn symbols(mut self, symbols: Vec<&str>) -> Self {
         self.symbols = Some(symbols.iter().map(|s| s.to_string()).collect());
+        self
+    }
+
+    pub fn ticker_type(mut self, ticker_type: TickerType) -> Self {
+        self.ticker_type = Some(ticker_type);
         self
     }
 }
@@ -54,6 +66,10 @@ impl From<Ticker24hr> for Request {
                 "symbols".to_owned(),
                 format!("[\"{}\"]", symbols.join("\",\"")),
             ));
+        }
+
+        if let Some(ticker_type) = request.ticker_type {
+            params.push(("type".to_owned(), ticker_type.to_string()));
         }
 
         Request {
@@ -79,10 +95,7 @@ mod tests {
 
     #[test]
     fn market_ticker_twenty_four_hr_convert_to_request_test() {
-        let request: Request = Ticker24hr::new()
-            .symbol("BNBUSDT")
-            .symbols(vec!["BTCUSDT", "BNBBTC"])
-            .into();
+        let request: Request = Ticker24hr::new().symbols(vec!["BTCUSDT", "BNBBTC"]).into();
 
         assert_eq!(
             request,
@@ -90,10 +103,7 @@ mod tests {
                 path: "/api/v3/ticker/24hr".to_owned(),
                 credentials: None,
                 method: Method::Get,
-                params: vec![
-                    ("symbol".to_owned(), "BNBUSDT".to_string()),
-                    ("symbols".to_owned(), "[\"BTCUSDT\",\"BNBBTC\"]".to_string()),
-                ],
+                params: vec![("symbols".to_owned(), "[\"BTCUSDT\",\"BNBBTC\"]".to_string())],
                 sign: false
             }
         );

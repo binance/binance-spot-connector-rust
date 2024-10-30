@@ -10,9 +10,11 @@ pub mod klines;
 pub mod ping;
 pub mod rolling_window_price_change_statistics;
 pub mod ticker_price;
+pub mod ticker_trading_day;
 pub mod ticker_twenty_four_hr;
 pub mod time;
 pub mod trades;
+pub mod ui_klines;
 
 use agg_trades::AggTrades;
 use avg_price::AvgPrice;
@@ -24,9 +26,11 @@ use klines::{KlineInterval, Klines};
 use ping::Ping;
 use rolling_window_price_change_statistics::RollingWindowPriceChangeStatistics;
 use ticker_price::TickerPrice;
+use ticker_trading_day::TickerTradingDay;
 use ticker_twenty_four_hr::Ticker24hr;
 use time::Time;
 use trades::Trades;
+use ui_klines::UIKlines;
 
 pub fn ping() -> Ping {
     Ping::new()
@@ -68,6 +72,10 @@ pub fn ticker_twenty_four_hr() -> Ticker24hr {
     Ticker24hr::new()
 }
 
+pub fn ticker_trading_day() -> TickerTradingDay {
+    TickerTradingDay::new()
+}
+
 pub fn ticker_price() -> TickerPrice {
     TickerPrice::new()
 }
@@ -78,4 +86,8 @@ pub fn book_ticker() -> BookTicker {
 
 pub fn rolling_window_price_change_statistics() -> RollingWindowPriceChangeStatistics {
     RollingWindowPriceChangeStatistics::new()
+}
+
+pub fn ui_klines(symbol: &str, interval: KlineInterval) -> UIKlines {
+    UIKlines::new(symbol, interval)
 }

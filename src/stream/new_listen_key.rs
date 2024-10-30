@@ -5,7 +5,7 @@ use crate::http::{request::Request, Credentials, Method};
 /// Start a new user data stream.
 /// The stream will close after 60 minutes unless a keepalive is sent. If the account has an active `listenKey`, that `listenKey` will be returned and its validity will be extended for 60 minutes.
 ///
-/// Weight: 1
+/// Weight: 2
 ///
 /// # Example
 ///

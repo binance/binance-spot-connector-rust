@@ -4,9 +4,19 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Get trades for a specific account and symbol.
 ///
-/// If `fromId` is set, it will get id &gt;= that `fromId`. Otherwise most recent orders are returned.
+/// * If `fromId` is set, it will get id >= that `fromId`. Otherwise most recent orders are returned.
+/// * The time between `startTime` and `endTime` can't be longer than 24 hours.
+/// * These are the supported combinations of all parameters:
+///    * `symbol`
+///    * `symbol` + `orderId`
+///    * `symbol` + `startTime`
+///    * `symbol` + `endTime`
+///    * `symbol` + `fromId`
+///    * `symbol` + `startTime` + `endTime`
+///    * `symbol` + `orderId` + `fromId`
 ///
-/// Weight(IP): 10
+///
+/// Weight(IP): 20
 ///
 /// # Example
 ///

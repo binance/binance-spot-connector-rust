@@ -62,12 +62,20 @@ name="market_klines"
 path="market/klines.rs"
 
 [[example]]
+name="market_ui_klines"
+path="market/ui_klines.rs"
+
+[[example]]
 name="market_avg_price"
 path="market/avg_price.rs"
 
 [[example]]
 name="market_ticker_twenty_four_hr"
 path="market/ticker_twenty_four_hr.rs"
+
+[[example]]
+name="market_ticker_trading_day"
+path="market/ticker_trading_day.rs"
 
 [[example]]
 name="market_ticker_price"
@@ -118,6 +126,14 @@ name="trade_new_oco_order"
 path="trade/new_oco_order.rs"
 
 [[example]]
+name="trade_new_oto_order"
+path="trade/new_oto_order.rs"
+
+[[example]]
+name="trade_new_otoco_order"
+path="trade/new_otoco_order.rs"
+
+[[example]]
 name="trade_get_oco_order"
 path="trade/get_oco_order.rs"
 
@@ -126,12 +142,24 @@ name="trade_cancel_oco_order"
 path="trade/cancel_oco_order.rs"
 
 [[example]]
+name="trade_get_allocations"
+path="trade/get_allocations.rs"
+
+[[example]]
+name="trade_get_commission_rates"
+path="trade/get_commission_rates.rs"
+
+[[example]]
 name="trade_get_oco_orders"
 path="trade/get_oco_orders.rs"
 
 [[example]]
 name="trade_get_open_oco_orders"
 path="trade/get_open_oco_orders.rs"
+
+[[example]]
+name="get_prevented_matches"
+path="trade/get_prevented_matches.rs"
 
 [[example]]
 name="trade_account"
@@ -364,6 +392,30 @@ path="wallet/user_asset.rs"
 [[example]]
 name="wallet_api_key_permission"
 path="wallet/api_key_permission.rs"
+
+[[example]]
+name="wallet_account_info"
+path="wallet/account_info.rs"
+
+[[example]]
+name="wallet_balance"
+path="wallet/balance.rs"
+
+[[example]]
+name="wallet_delist_schedule"
+path="wallet/delist_schedule.rs"
+
+[[example]]
+name="wallet_deposit_address_list"
+path="wallet/deposit_address_list.rs"
+
+[[example]]
+name="wallet_deposit_credit_apply"
+path="wallet/deposit_credit_apply.rs"
+
+[[example]]
+name="wallet_transfer_history"
+path="wallet/transfer_history.rs"
 
 [[example]]
 name="stream_new_listen_key"

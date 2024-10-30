@@ -4,7 +4,7 @@ use crate::http::{request::Request, Method};
 ///
 /// Current average price for a symbol.
 ///
-/// Weight(IP): 1
+/// Weight(IP): 2
 ///
 /// # Example
 ///

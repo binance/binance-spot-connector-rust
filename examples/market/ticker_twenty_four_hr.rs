@@ -1,6 +1,6 @@
 use binance_spot_connector_rust::{
     hyper::{BinanceHttpClient, Error},
-    market,
+    market::{self, rolling_window_price_change_statistics::TickerType},
 };
 use env_logger::Builder;
 
@@ -12,8 +12,8 @@ async fn main() -> Result<(), Error> {
 
     let client = BinanceHttpClient::default();
     let request = market::ticker_twenty_four_hr()
-        .symbol("BNBUSDT")
-        .symbols(vec!["BTCUSDT", "BNBBTC"]);
+        .symbols(vec!["BTCUSDT", "BNBBTC"])
+        .ticker_type(TickerType::Mini);
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())

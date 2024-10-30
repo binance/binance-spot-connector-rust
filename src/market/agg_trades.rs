@@ -3,10 +3,9 @@ use crate::http::{request::Request, Method};
 /// `GET /api/v3/aggTrades`
 ///
 /// Get compressed, aggregate trades. Trades that fill at the time, from the same order, with the same price will have the quantity aggregated.
-/// * If `startTime` and `endTime` are sent, time between startTime and endTime must be less than 1 hour.
 /// * If `fromId`, `startTime`, and `endTime` are not sent, the most recent aggregate trades will be returned.
 ///
-/// Weight(IP): 1
+/// Weight(IP): 2
 ///
 /// # Example
 ///

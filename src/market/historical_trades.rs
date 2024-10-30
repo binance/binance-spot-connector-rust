@@ -6,7 +6,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Get older market trades.
 ///
-/// Weight(IP): 5
+/// Weight(IP): 25
 ///
 /// # Example
 ///

@@ -4,7 +4,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Get current account information.
 ///
-/// Weight(IP): 10
+/// Weight(IP): 20
 ///
 /// # Example
 ///
@@ -14,6 +14,7 @@ use crate::http::{request::Request, Credentials, Method};
 /// let request = trade::account();
 /// ```
 pub struct Account {
+    omit_zero_balances: Option<bool>,
     recv_window: Option<i64>,
     credentials: Option<Credentials>,
 }
@@ -21,9 +22,15 @@ pub struct Account {
 impl Account {
     pub fn new() -> Self {
         Self {
+            omit_zero_balances: None,
             recv_window: None,
             credentials: None,
         }
+    }
+
+    pub fn omit_zero_balances(mut self, omit_zero_balances: bool) -> Self {
+        self.omit_zero_balances = Some(omit_zero_balances);
+        self
     }
 
     pub fn recv_window(mut self, recv_window: i64) -> Self {
@@ -40,6 +47,13 @@ impl Account {
 impl From<Account> for Request {
     fn from(request: Account) -> Request {
         let mut params = vec![];
+
+        if let Some(omit_zero_balances) = request.omit_zero_balances {
+            params.push((
+                "omitZeroBalances".to_owned(),
+                omit_zero_balances.to_string(),
+            ));
+        }
 
         if let Some(recv_window) = request.recv_window {
             params.push(("recvWindow".to_owned(), recv_window.to_string()));

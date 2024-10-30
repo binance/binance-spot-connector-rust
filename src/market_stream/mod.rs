@@ -2,6 +2,7 @@
 //!
 //! A collection of SPOT Market Websocket streams.
 pub mod agg_trade;
+pub mod avg_price;
 pub mod book_ticker;
 pub mod diff_depth;
 pub mod kline;
@@ -14,6 +15,7 @@ pub mod trade;
 use crate::market::klines::KlineInterval;
 
 use agg_trade::AggTradeStream;
+use avg_price::AvgPriceStream;
 use book_ticker::BookTickerStream;
 use diff_depth::DiffDepthStream;
 use kline::KlineStream;
@@ -25,6 +27,10 @@ use trade::TradeStream;
 
 pub fn agg_trades(symbol: &str) -> AggTradeStream {
     AggTradeStream::new(symbol)
+}
+
+pub fn avg_price(symbol: &str) -> AvgPriceStream {
+    AvgPriceStream::new(symbol)
 }
 
 pub fn individual_symbol_book_ticker(symbol: &str) -> BookTickerStream {

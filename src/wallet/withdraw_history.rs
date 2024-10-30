@@ -8,7 +8,9 @@ use crate::http::{request::Request, Credentials, Method};
 /// * Please notice the default `startTime` and `endTime` to make sure that time interval is within 0-90 days.
 /// * If both `startTime` and `endTime` are sent, time between `startTime` and `endTime` must be less than 90 days
 ///
-/// Weight(IP): 1
+/// Weight(IP): 18000
+/// * Request limit: 10 requests per second
+/// * This endpoint specifically uses per second IP rate limit, user's total second level IP rate limit is 180000/second. Response from the endpoint contains header key `X-SAPI-USED-IP-WEIGHT-1S`, which defines weight used by the current IP.
 ///
 /// # Example
 ///

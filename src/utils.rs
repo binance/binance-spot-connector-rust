@@ -1,19 +1,20 @@
 use crate::http::Signature;
-use base64::encode;
+use base64::{engine::general_purpose, Engine as _};
 use ed25519_dalek::pkcs8::DecodePrivateKey;
 use ed25519_dalek::SigningKey;
 use ed25519_dalek::{Signature as Ed25519Signature, Signer};
 use hmac::{Hmac, Mac};
-use sha2::{digest::InvalidLength, Sha256};
+use sha2::Sha256;
+use std::error::Error;
 
-pub fn sign(payload: &str, signature: &Signature) -> Result<String, InvalidLength> {
+pub fn sign(payload: &str, signature: &Signature) -> Result<String, Box<dyn Error>> {
     match signature {
         Signature::Hmac(signature) => sign_hmac(payload, &signature.api_secret),
         Signature::Ed25519(signature) => sign_ed25519(payload, &signature.key),
     }
 }
 
-fn sign_hmac(payload: &str, key: &str) -> Result<String, InvalidLength> {
+fn sign_hmac(payload: &str, key: &str) -> Result<String, Box<dyn Error>> {
     let mut mac = Hmac::<Sha256>::new_from_slice(key.to_string().as_bytes())?;
 
     mac.update(payload.to_string().as_bytes());
@@ -21,12 +22,11 @@ fn sign_hmac(payload: &str, key: &str) -> Result<String, InvalidLength> {
     Ok(format!("{:x}", result.into_bytes()))
 }
 
-fn sign_ed25519(payload: &str, key: &str) -> Result<String, InvalidLength> {
-    let private = SigningKey::from_pkcs8_pem(key);
+fn sign_ed25519(payload: &str, key: &str) -> Result<String, Box<dyn Error>> {
+    let private_key = SigningKey::from_pkcs8_pem(key)?;
 
-    let signing_key: SigningKey = SigningKey::from_bytes(&private.unwrap().to_bytes());
-    let signature: Ed25519Signature = signing_key.sign(&payload.to_string().into_bytes());
-    Ok(encode(signature.to_bytes()))
+    let signature: Ed25519Signature = private_key.sign(payload.as_bytes());
+    Ok(general_purpose::STANDARD.encode(signature.to_bytes()))
 }
 
 #[cfg(test)]
