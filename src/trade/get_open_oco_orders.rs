@@ -2,7 +2,7 @@ use crate::http::{request::Request, Credentials, Method};
 
 /// `GET /api/v3/openOrderList`
 ///
-/// Weight(IP): 3
+/// Weight(IP): 6
 ///
 /// # Example
 ///

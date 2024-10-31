@@ -5,8 +5,8 @@ use crate::http::{request::Request, Credentials, Method};
 /// Get all open orders on a symbol. Careful when accessing this with no symbol.
 ///
 /// Weight(IP):
-/// * `3` for a single symbol;
-/// * `40` when the symbol parameter is omitted;
+/// * `6` for a single symbol;
+/// * `80` when the symbol parameter is omitted;
 ///
 /// # Example
 ///

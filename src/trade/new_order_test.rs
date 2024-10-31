@@ -31,6 +31,7 @@ pub struct NewOrderTest {
     iceberg_qty: Option<Decimal>,
     new_order_resp_type: Option<NewOrderResponseType>,
     recv_window: Option<u64>,
+    compute_commission_rates: Option<bool>,
     credentials: Option<Credentials>,
 }
 
@@ -50,6 +51,7 @@ impl NewOrderTest {
             iceberg_qty: None,
             new_order_resp_type: None,
             recv_window: None,
+            compute_commission_rates: None,
             credentials: None,
         }
     }
@@ -101,6 +103,11 @@ impl NewOrderTest {
 
     pub fn recv_window(mut self, recv_window: u64) -> Self {
         self.recv_window = Some(recv_window);
+        self
+    }
+
+    pub fn compute_commission_rates(mut self, compute_commission_rates: bool) -> Self {
+        self.compute_commission_rates = Some(compute_commission_rates);
         self
     }
 
@@ -159,6 +166,13 @@ impl From<NewOrderTest> for Request {
 
         if let Some(recv_window) = request.recv_window {
             params.push(("recvWindow".to_owned(), recv_window.to_string()));
+        }
+
+        if let Some(compute_commission_rates) = request.compute_commission_rates {
+            params.push((
+                "computeCommissionRates".to_owned(),
+                compute_commission_rates.to_string(),
+            ));
         }
 
         Request {

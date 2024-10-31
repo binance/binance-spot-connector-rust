@@ -12,6 +12,7 @@ use crate::http::{request::Request, Credentials, Method};
 /// let request = wallet::dustable_assets();
 /// ```
 pub struct DustableAssets {
+    account_type: Option<String>,
     recv_window: Option<u64>,
     credentials: Option<Credentials>,
 }
@@ -19,9 +20,15 @@ pub struct DustableAssets {
 impl DustableAssets {
     pub fn new() -> Self {
         Self {
+            account_type: None,
             recv_window: None,
             credentials: None,
         }
+    }
+
+    pub fn account_type(mut self, account_type: &str) -> Self {
+        self.account_type = Some(account_type.to_owned());
+        self
     }
 
     pub fn recv_window(mut self, recv_window: u64) -> Self {
@@ -38,6 +45,10 @@ impl DustableAssets {
 impl From<DustableAssets> for Request {
     fn from(request: DustableAssets) -> Request {
         let mut params = vec![];
+
+        if let Some(account_type) = request.account_type {
+            params.push(("accountType".to_owned(), account_type));
+        }
 
         if let Some(recv_window) = request.recv_window {
             params.push(("recvWindow".to_owned(), recv_window.to_string()));

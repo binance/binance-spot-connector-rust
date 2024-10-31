@@ -11,9 +11,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     let client = BinanceHttpClient::default();
-    let request = market::book_ticker()
-        .symbol("BNBUSDT")
-        .symbols(vec!["BTCUSDT", "BNBBTC"]);
+    let request = market::book_ticker().symbols(vec!["BTCUSDT", "BNBBTC"]);
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())

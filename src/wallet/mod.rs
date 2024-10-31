@@ -1,13 +1,18 @@
 //! Market Data
 
+pub mod account_info;
 pub mod account_snapshot;
 pub mod account_status;
 pub mod api_key_permission;
 pub mod api_trading_status;
 pub mod asset_detail;
 pub mod asset_dividend_record;
+pub mod balance;
 pub mod coin_info;
+pub mod delist_schedule;
 pub mod deposit_address;
+pub mod deposit_address_list;
+pub mod deposit_credit_apply;
 pub mod deposit_history;
 pub mod disable_fast_withdraw;
 pub mod dust_log;
@@ -17,6 +22,7 @@ pub mod enable_fast_withdraw;
 pub mod funding_wallet;
 pub mod system_status;
 pub mod trade_fee;
+pub mod transfer_history;
 pub mod universal_transfer;
 pub mod universal_transfer_history;
 pub mod user_asset;
@@ -25,14 +31,19 @@ pub mod withdraw_history;
 
 use rust_decimal::Decimal;
 
+use account_info::AccountInfo;
 use account_snapshot::AccountSnapshot;
 use account_status::AccountStatus;
 use api_key_permission::APIKeyPermission;
 use api_trading_status::APITradingStatus;
 use asset_detail::AssetDetail;
 use asset_dividend_record::AssetDividendRecord;
+use balance::Balance;
 use coin_info::CoinInfo;
+use delist_schedule::DelistSchedule;
 use deposit_address::DepositAddress;
+use deposit_address_list::DepositAddressList;
+use deposit_credit_apply::DepositCreditApply;
 use deposit_history::DepositHistory;
 use disable_fast_withdraw::DisableFastWithdraw;
 use dust_log::DustLog;
@@ -42,6 +53,7 @@ use enable_fast_withdraw::EnableFastWithdraw;
 use funding_wallet::FundingWallet;
 use system_status::SystemStatus;
 use trade_fee::TradeFee;
+use transfer_history::TransferHistory;
 use universal_transfer::UniversalTransfer;
 use universal_transfer_history::UniversalTransferHistory;
 use user_asset::UserAsset;
@@ -134,4 +146,28 @@ pub fn user_asset() -> UserAsset {
 
 pub fn api_key_permission() -> APIKeyPermission {
     APIKeyPermission::new()
+}
+
+pub fn account_info() -> AccountInfo {
+    AccountInfo::new()
+}
+
+pub fn balance() -> Balance {
+    Balance::new()
+}
+
+pub fn delist_schedule() -> DelistSchedule {
+    DelistSchedule::new()
+}
+
+pub fn deposit_address_list(coin: &str) -> DepositAddressList {
+    DepositAddressList::new(coin)
+}
+
+pub fn deposit_credit_apply() -> DepositCreditApply {
+    DepositCreditApply::new()
+}
+
+pub fn transfer_history(email: &str, start_time: u64, end_time: u64) -> TransferHistory {
+    TransferHistory::new(email, start_time, end_time)
 }

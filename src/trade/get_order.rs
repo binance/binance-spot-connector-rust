@@ -7,7 +7,7 @@ use crate::http::{request::Request, Credentials, Method};
 /// * Either `orderId` or `origClientOrderId` must be sent.
 /// * For some historical orders `cummulativeQuoteQty` will be &lt; 0, meaning the data is not available at this time.
 ///
-/// Weight(IP): 2
+/// Weight(IP): 4
 ///
 /// # Example
 ///

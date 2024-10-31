@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.3.0 - 2024-10-31
+### Added
+- Market endpoints
+  - `GET /api/v3/ticker/tradingDay`
+  - `GET /api/v3/uiKlines`
+
+- Trade endpoints
+  - `GET /api/v3/myAllocations`
+  - `GET /api/v3/account/commission`
+  - `GET /api/v3/myPreventedMatches`
+
+- Wallet endpoints
+  - `GET /sapi/v1/account/info`
+  - `GET /sapi/v1/asset/wallet/balance`
+  - `GET /sapi/v1/spot/delist-schedule`
+  - `GET /sapi/v1/capital/deposit/address/list`
+  - `POST /sapi/v1/capital/deposit/credit-apply`
+  - `GET /sapi/v1/asset/custody/transfer-history`
+
+- WebsocketStream:
+  - `<symbol>@avgPrice`
+
+### Updated
+- Updated deprecated trade endpoint `POST /api/v3/order/oco` to `POST /api/v3/orderList/oco`
+- Added parameters `permissions`, `showPermissionSets` and `symbolStatus` to endpoint `GET /api/v3/exchangeInfo`
+- Added parameter `time_zone` to endpoint `GET /api/v3/klines`
+- Added parameter `type` to endpoints `GET /api/v3/ticker` and `GET /api/v3/ticker/24hr`
+- Added parameter `omitZeroBalances` to endpoint `GET /api/v3/account`
+- Added parameter `computeCommissionRates` to endpoint `POST /api/v3/order/test`
+- Updated `ed25519` and `hmac` signature to allow the function to handle any error type that implements the `Error` trait, including `ed25519_dalek::pkcs8::Error`, without needing explicit conversions between error types.
+
 ## 1.2.1 - 2024-10-03
 ### Updated
 - Updated url links

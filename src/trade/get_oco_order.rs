@@ -4,7 +4,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Retrieves a specific OCO based on provided optional parameters
 ///
-/// Weight(IP): 2
+/// Weight(IP): 4
 ///
 /// # Example
 ///

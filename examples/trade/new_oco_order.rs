@@ -16,9 +16,18 @@ async fn main() -> Result<(), Error> {
         .init();
     let credentials = Credentials::from_hmac("api-key".to_owned(), "api-secret".to_owned());
     let client = BinanceHttpClient::default().credentials(credentials);
-    let request = trade::new_oco_order("BNBUSDT", Side::Sell, dec!(0.1), dec!(400.15), dec!(390.3))
-        .stop_limit_price(dec!(380.3))
-        .stop_limit_time_in_force(TimeInForce::Gtc);
+    let request = trade::new_oco_order(
+        "BNBUSDT",
+        Side::Sell,
+        dec!(1.0),
+        "LIMIT_MAKER",
+        "STOP_LOSS_LIMIT",
+    )
+    .above_price(dec!(610.1))
+    .below_price(dec!(600.3))
+    .below_stop_price(dec!(598.2))
+    .below_trailing_delta(dec!(60))
+    .below_time_in_force(TimeInForce::Gtc);
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())

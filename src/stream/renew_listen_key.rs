@@ -4,7 +4,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Keepalive a user data stream to prevent a time out. User data streams will close after 60 minutes. It's recommended to send a ping about every 30 minutes.
 ///
-/// Weight: 1
+/// Weight: 2
 ///
 /// # Example
 ///

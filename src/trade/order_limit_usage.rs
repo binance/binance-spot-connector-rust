@@ -4,7 +4,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Displays the user's current order count usage for all intervals.
 ///
-/// Weight(IP): 20
+/// Weight(IP): 40
 ///
 /// # Example
 ///

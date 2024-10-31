@@ -11,9 +11,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     let client = BinanceHttpClient::default();
-    let request = market::klines("BNBUSDT", KlineInterval::Hours1)
-        .start_time(1654079109000)
-        .end_time(1654079209000);
+    let request = market::klines("BNBUSDT", KlineInterval::Hours1).limit(5);
     let data = client.send(request).await?.into_body_str().await?;
     log::info!("{}", data);
     Ok(())

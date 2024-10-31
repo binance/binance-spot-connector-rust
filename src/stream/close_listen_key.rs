@@ -4,7 +4,7 @@ use crate::http::{request::Request, Credentials, Method};
 ///
 /// Close out a user data stream.
 ///
-/// Weight: 1
+/// Weight: 2
 ///
 /// # Example
 ///

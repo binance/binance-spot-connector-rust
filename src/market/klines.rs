@@ -42,7 +42,7 @@ pub enum KlineInterval {
 ///
 /// * If `startTime` and `endTime` are not sent, the most recent klines are returned.
 ///
-/// Weight(IP): 1
+/// Weight(IP): 2
 ///
 /// # Example
 ///
@@ -58,6 +58,7 @@ pub struct Klines {
     interval: KlineInterval,
     start_time: Option<u64>,
     end_time: Option<u64>,
+    time_zone: Option<String>,
     limit: Option<u32>,
 }
 
@@ -68,6 +69,7 @@ impl Klines {
             interval,
             start_time: None,
             end_time: None,
+            time_zone: None,
             limit: None,
         }
     }
@@ -79,6 +81,11 @@ impl Klines {
 
     pub fn end_time(mut self, end_time: u64) -> Self {
         self.end_time = Some(end_time);
+        self
+    }
+
+    pub fn time_zone(mut self, time_zone: &str) -> Self {
+        self.time_zone = Some(time_zone.to_owned());
         self
     }
 
@@ -101,6 +108,10 @@ impl From<Klines> for Request {
 
         if let Some(end_time) = request.end_time {
             params.push(("endTime".to_owned(), end_time.to_string()));
+        }
+
+        if let Some(time_zone) = request.time_zone {
+            params.push(("timeZone".to_owned(), time_zone));
         }
 
         if let Some(limit) = request.limit {
