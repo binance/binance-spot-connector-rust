@@ -1,5 +1,11 @@
 # Changelog
 
+## 69.2.2 - 2026-09-09
+
+#### Changed (1)
+
+- Fixed bug on WebSocket API `SIGNED` requests containing non-ASCII characters.
+
 ## 69.2.1 - 2026-09-04
 
 ### Changed (1)

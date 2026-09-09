@@ -259,6 +259,48 @@ impl SignatureGenerator {
             query_str
         };
 
+        self.sign_payload(&params)
+    }
+
+    /// Generates a signature for a WebSocket API request.
+    ///
+    /// # Arguments
+    ///
+    /// * `params` - A map of parameters to be signed (already sorted by the caller)
+    ///
+    /// # Returns
+    ///
+    /// A signature string (hex for HMAC, base64 for RSA/ED25519)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - No API secret or private key is provided
+    /// - Key initialization fails
+    /// - Signing process encounters an error
+    /// - An unsupported key type is used
+    pub fn get_signature_unencoded(&self, params: &BTreeMap<String, Value>) -> Result<String> {
+        let payload = build_plain_query_string(params)?;
+        self.sign_payload(&payload)
+    }
+
+    /// Signs the given payload using the appropriate signing method based on the available keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `params` - The payload string to be signed
+    ///
+    /// # Returns
+    ///
+    /// A `Result` containing the signature string or an error if signing fails
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - No API secret or private key is provided
+    /// - Key initialization fails
+    /// - Signing process encounters an error
+    fn sign_payload(&self, params: &str) -> Result<String> {
         if self.private_key.is_none() {
             if let Some(secret) = self.api_secret.as_ref() {
                 let mut mac = Hmac::<Sha256>::new_from_slice(secret.as_bytes())
@@ -526,6 +568,67 @@ pub fn build_query_string(params: &BTreeMap<String, Value>) -> Result<String, an
     }
 
     Ok(segments.join("&"))
+}
+
+/// Builds a query string from a map of key-value parameters, without URL-encoding the values.
+///
+/// This mirrors [`build_query_string`], converting the same set of JSON `Value` types into
+/// `parameter=value` segments joined by `&`.
+///
+/// # Arguments
+///
+/// * `params` - A map of parameter names to their corresponding JSON values
+///
+/// # Returns
+///
+/// * `Result<String, anyhow::Error>` - A `&`-joined string of raw `parameter=value` pairs, or an error
+///
+/// # Errors
+///
+/// Returns an error if:
+/// - An object value is encountered or JSON serialization fails
+/// - A key or value contains `&`, `=`, or an ASCII control character
+pub fn build_plain_query_string(params: &BTreeMap<String, Value>) -> Result<String, anyhow::Error> {
+    let mut segments = Vec::with_capacity(params.len());
+
+    for (key, value) in params {
+        if value.is_null() {
+            continue;
+        }
+
+        let value_str = match value {
+            Value::String(s) => s.clone(),
+            Value::Bool(b) => b.to_string(),
+            Value::Number(n) => n.to_string(),
+            Value::Array(_) | Value::Object(_) => serde_json::to_string(value)
+                .with_context(|| format!("failed to JSON-serialize `{}`", key))?,
+            Value::Null => unreachable!(),
+        };
+
+        ensure_safe_plain_query_component(key)
+            .with_context(|| format!("unsafe character in parameter name `{key}`"))?;
+        ensure_safe_plain_query_component(&value_str)
+            .with_context(|| format!("unsafe character in value of parameter `{key}`"))?;
+
+        segments.push(format!("{key}={value_str}"));
+    }
+
+    Ok(segments.join("&"))
+}
+
+/// Checks that a string does not contain characters that would be ambiguous or unsafe when
+/// embedded, unescaped, into a `key=value&key=value` signature payload.
+///
+/// # Errors
+///
+/// Returns an error if `s` contains `&`, `=`, or an ASCII control character.
+fn ensure_safe_plain_query_component(s: &str) -> Result<(), anyhow::Error> {
+    if let Some(c) = s.chars().find(|&c| c == '&' || c == '=' || c.is_control()) {
+        return Err(anyhow::anyhow!(
+            "value contains disallowed character {c:?}; '&', '=', and control characters are not permitted in WebSocket API signed parameters"
+        ));
+    }
+    Ok(())
 }
 
 /// Determines whether a request should be retried based on:
@@ -1231,7 +1334,7 @@ pub fn build_websocket_api_message(
         if !skip_auth {
             let sig = configuration
                 .signature_gen
-                .get_signature(&sorted, None)
+                .get_signature_unencoded(&sorted)
                 .expect("signature generation");
             sorted.insert("signature".into(), Value::String(sig));
         }
@@ -1757,6 +1860,91 @@ mod tests {
         }
     }
 
+    mod build_plain_query_string {
+        use std::collections::BTreeMap;
+
+        use serde_json::{Value, json};
+
+        use crate::common::utils::build_plain_query_string;
+
+        fn mk_map(pairs: Vec<(&str, Value)>) -> BTreeMap<String, Value> {
+            let mut m = BTreeMap::new();
+            for (k, v) in pairs {
+                m.insert(k.to_string(), v);
+            }
+            m
+        }
+
+        #[test]
+        fn empty_map_returns_empty_string() {
+            let params = BTreeMap::new();
+            let qs = build_plain_query_string(&params).unwrap();
+            assert_eq!(qs, "");
+        }
+
+        #[test]
+        fn string_and_number_and_bool_are_not_percent_encoded() {
+            let params = mk_map(vec![
+                ("foo", json!("bar")),
+                ("num", json!(42)),
+                ("flag", json!(true)),
+            ]);
+            let qs = build_plain_query_string(&params).unwrap();
+            assert_eq!(qs, "flag=true&foo=bar&num=42");
+        }
+
+        #[test]
+        fn null_is_skipped() {
+            let params = mk_map(vec![("a", json!(true)), ("b", Value::Null)]);
+            let qs = build_plain_query_string(&params).unwrap();
+            assert_eq!(qs, "a=true");
+        }
+
+        #[test]
+        fn non_ascii_values_are_kept_raw() {
+            let params = mk_map(vec![("symbol", json!("我踏马来了USDT"))]);
+            let qs = build_plain_query_string(&params).unwrap();
+            assert_eq!(qs, "symbol=我踏马来了USDT");
+        }
+
+        #[test]
+        fn value_containing_ampersand_is_rejected() {
+            let params = mk_map(vec![("a", json!("1&b=2"))]);
+            let err = build_plain_query_string(&params).unwrap_err().to_string();
+            assert!(err.contains("unsafe character"), "unexpected error: {err}");
+        }
+
+        #[test]
+        fn value_containing_equals_is_rejected() {
+            let params = mk_map(vec![("a", json!("1=2"))]);
+            let err = build_plain_query_string(&params).unwrap_err().to_string();
+            assert!(err.contains("unsafe character"), "unexpected error: {err}");
+        }
+
+        #[test]
+        fn value_containing_control_character_is_rejected() {
+            let params = mk_map(vec![("a", json!("line1\nline2"))]);
+            let err = build_plain_query_string(&params).unwrap_err().to_string();
+            assert!(err.contains("unsafe character"), "unexpected error: {err}");
+        }
+
+        #[test]
+        fn key_containing_ampersand_is_rejected() {
+            let params = mk_map(vec![("a&b", json!("v"))]);
+            let err = build_plain_query_string(&params).unwrap_err().to_string();
+            assert!(err.contains("unsafe character"), "unexpected error: {err}");
+        }
+
+        #[test]
+        fn ambiguous_parameter_sets_no_longer_collide() {
+            let colliding = mk_map(vec![("a", json!("1&b=2"))]);
+            let distinct = mk_map(vec![("a", json!("1")), ("b", json!("2"))]);
+
+            assert!(build_plain_query_string(&colliding).is_err());
+            assert_eq!(build_plain_query_string(&distinct).unwrap(), "a=1&b=2");
+        }
+    }
+
     #[cfg(feature = "openssl-tls")]
     mod signature_generator {
         use base64::{Engine, engine::general_purpose};
@@ -2035,6 +2223,61 @@ mod tests {
                 .unwrap_err()
                 .to_string();
             assert!(err.contains("Either 'api_secret' or 'private_key' must be provided"));
+        }
+
+        #[test]
+        fn unencoded_hmac_signature_does_not_percent_encode_non_ascii() {
+            let mut params = BTreeMap::new();
+            params.insert("apiKey".into(), Value::String("key".into()));
+            params.insert("symbol".into(), Value::String("我踏马来了USDT".into()));
+            params.insert("timestamp".into(), Value::Number(1_i64.into()));
+
+            let signature_gen = SignatureGenerator::new(Some("test-secret".into()), None, None);
+            let sig = signature_gen
+                .get_signature_unencoded(&params)
+                .expect("HMAC unencoded signing failed");
+
+            let expected_payload = "apiKey=key&symbol=我踏马来了USDT&timestamp=1";
+            let mut mac = Hmac::<Sha256>::new_from_slice(b"test-secret").unwrap();
+            mac.update(expected_payload.as_bytes());
+            let expected = hex::encode(mac.finalize().into_bytes());
+
+            assert_eq!(sig, expected);
+
+            let encoded_sig = signature_gen
+                .get_signature(&params, None)
+                .expect("HMAC encoded signing failed");
+            assert_ne!(sig, encoded_sig);
+        }
+
+        #[test]
+        fn unencoded_ed25519_signature_does_not_percent_encode_non_ascii() {
+            let mut params = BTreeMap::new();
+            params.insert("apiKey".into(), Value::String("key".into()));
+            params.insert("symbol".into(), Value::String("我踏马来了USDT".into()));
+            params.insert("timestamp".into(), Value::Number(1_i64.into()));
+
+            let ed = PKey::generate_ed25519().unwrap();
+            let priv_pem = ed.private_key_to_pem_pkcs8().unwrap();
+
+            let signature_gen =
+                SignatureGenerator::new(None, Some(PrivateKey::Raw(priv_pem.clone())), None);
+            let sig = signature_gen
+                .get_signature_unencoded(&params)
+                .expect("Ed25519 unencoded signing failed");
+
+            let expected_payload = "apiKey=key&symbol=我踏马来了USDT&timestamp=1";
+            let pem_str = String::from_utf8(priv_pem).unwrap();
+            let b64 = pem_str
+                .lines()
+                .filter(|l| !l.starts_with("-----"))
+                .collect::<String>();
+            let der = general_purpose::STANDARD.decode(b64).unwrap();
+            let mut sk = SigningKey::from_pkcs8_der(&der).unwrap();
+            let expected_bytes = sk.sign(expected_payload.as_bytes()).to_bytes();
+            let expected_sig = general_purpose::STANDARD.encode(expected_bytes);
+
+            assert_eq!(sig, expected_sig);
         }
     }
 
@@ -3645,6 +3888,40 @@ mod tests {
 
             let sig = params["signature"].as_str().unwrap();
             assert!(!sig.is_empty(), "signature should not be empty");
+        }
+
+        #[test]
+        fn signed_non_ascii_symbol_is_not_percent_encoded_in_signature() {
+            use hmac::{Hmac, Mac};
+            use sha2::Sha256;
+
+            let mut payload = BTreeMap::new();
+            payload.insert("symbol".into(), Value::String("我踏马来了USDT".into()));
+            let cfg = make_config();
+
+            let (_id, req) = build_websocket_api_message(
+                &cfg,
+                "method",
+                payload.clone(),
+                &WebsocketMessageSendOptions {
+                    with_api_key: true,
+                    is_signed: true,
+                    ..Default::default()
+                },
+                false,
+            );
+
+            let params = &req["params"];
+            let timestamp = params["timestamp"].as_i64().unwrap();
+            let sig = params["signature"].as_str().unwrap();
+
+            let expected_payload =
+                format!("apiKey=api-key&symbol=我踏马来了USDT&timestamp={timestamp}");
+            let mut mac = Hmac::<Sha256>::new_from_slice(b"api-secret").unwrap();
+            mac.update(expected_payload.as_bytes());
+            let expected_sig = hex::encode(mac.finalize().into_bytes());
+
+            assert_eq!(sig, expected_sig);
         }
 
         #[test]
