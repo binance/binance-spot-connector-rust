@@ -1,5 +1,18 @@
 # Changelog
 
+## 69.2.3 - 2026-09-10
+
+**Derivatives Trading USDS Futures**
+
+### Changed (1)
+
+#### REST API
+
+- Modified parameter `incomeType`:
+  - enum added: `SPECIAL_FUNDING_FEE`
+  - affected methods:
+    - `get_income_history()` (`GET /fapi/v1/income`)
+
 ## 69.2.2 - 2026-09-09
 
 #### Changed (1)

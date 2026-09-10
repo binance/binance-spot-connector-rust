@@ -41,10 +41,10 @@ pub struct AccountTradeListResponseInner {
     /// Qty.
     #[serde(rename = "qty", skip_serializing_if = "Option::is_none")]
     pub qty: Option<String>,
-    /// Quote Qty.
+    /// Quote asset quantity. Populated for USDⓈ-M symbols; returns \"0\" for COIN-M symbols.
     #[serde(rename = "quoteQty", skip_serializing_if = "Option::is_none")]
     pub quote_qty: Option<String>,
-    /// Base Qty.
+    /// Base asset quantity. Populated for COIN-M symbols; returns \"0\" for USDⓈ-M symbols.
     #[serde(rename = "baseQty", skip_serializing_if = "Option::is_none")]
     pub base_qty: Option<String>,
     /// Margin Asset.

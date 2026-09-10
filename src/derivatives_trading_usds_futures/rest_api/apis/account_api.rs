@@ -175,6 +175,8 @@ pub enum GetIncomeHistoryIncomeTypeEnum {
     FeeReturn,
     #[serde(rename = "BFUSD_REWARD")]
     BfusdReward,
+    #[serde(rename = "SPECIAL_FUNDING_FEE")]
+    SpecialFundingFee,
 }
 
 impl GetIncomeHistoryIncomeTypeEnum {
@@ -203,6 +205,7 @@ impl GetIncomeHistoryIncomeTypeEnum {
             Self::StrategyUmfuturesTransfer => "STRATEGY_UMFUTURES_TRANSFER",
             Self::FeeReturn => "FEE_RETURN",
             Self::BfusdReward => "BFUSD_REWARD",
+            Self::SpecialFundingFee => "SPECIAL_FUNDING_FEE",
         }
     }
 }
@@ -234,6 +237,7 @@ impl std::str::FromStr for GetIncomeHistoryIncomeTypeEnum {
             "STRATEGY_UMFUTURES_TRANSFER" => Ok(Self::StrategyUmfuturesTransfer),
             "FEE_RETURN" => Ok(Self::FeeReturn),
             "BFUSD_REWARD" => Ok(Self::BfusdReward),
+            "SPECIAL_FUNDING_FEE" => Ok(Self::SpecialFundingFee),
             other => Err(format!("invalid GetIncomeHistoryIncomeTypeEnum: {}", other).into()),
         }
     }
